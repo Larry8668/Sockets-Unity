@@ -16,7 +16,12 @@ public class SocketConnection : MonoBehaviour
 
         socket.On("test-back", (data) =>
         {
-            Debug.Log(data);
+            string res = data.ToString();
+            /*Debug.Log(res);*/
+            res = res.Substring(1, res.Length - 2);
+            Test t = JsonUtility.FromJson<Test>(res);
+
+            Debug.Log(t.text);
         });
 
 
@@ -32,4 +37,15 @@ public class SocketConnection : MonoBehaviour
         }
     }
 
+    private void OnApplicationQuit()
+    {
+        socket.Disconnect();
+    }
+
+}
+
+[System.Serializable]
+public class Test
+{
+    public string text;
 }
