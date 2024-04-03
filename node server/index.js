@@ -11,6 +11,10 @@ io.on("connection", (socket)=>{
         var test = {text: "Hi"};
         socket.emit("test-back", test);
     })
+
+    socket.on("disconnect", (data)=>{
+        console.log("Client Disconnected!");
+    })
 })
 
 console.log("Server Listening at :", port);
