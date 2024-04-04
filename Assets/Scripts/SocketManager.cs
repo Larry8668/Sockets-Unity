@@ -1,51 +1,45 @@
 using UnityEngine;
 using SocketIOClient;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
-public class SocketConnection : MonoBehaviour
+public class SocketManager: MonoBehaviour
 {
     private SocketIOUnity socket;
+    public MovementHandler movementScript;
 
-    void Start()
+    private void Start()
     {
         socket = new SocketIOUnity("http://localhost:3000");
-
         socket.OnConnected += (sender, e) =>
         {
-            Debug.Log("Connected");
+            Debug.Log("Connected to Server");
         };
 
-        socket.On("test-back", (data) =>
+        socket.On("move", (data) =>
         {
-            string res = data.ToString();
-            /*Debug.Log(res);*/
-            res = res.Substring(1, res.Length - 2);
-            Test t = JsonUtility.FromJson<Test>(res);
-
-            Debug.Log(t.text);
+            Debug.Log("coords --> " + getCoord(data.ToString()));
+            movementScript.Target = getCoord(data.ToString());
         });
-
 
         socket.Connect();
     }
 
-    private void Update()
+    Vector3 getCoord( string jsonData )
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            socket.Emit("test", "bruh");
-            Debug.Log("Msg sent");
-        }
+        List<Dictionary<string, float>> dataList = JsonConvert.DeserializeObject<List<Dictionary<string, float>>>(jsonData);
+
+        float x = dataList[0]["x"];
+        float y = dataList[0]["y"];
+        float z = dataList[0]["z"];
+
+        Vector3 vector3Data = new Vector3(x, y, z);
+
+        return vector3Data;
     }
 
     private void OnApplicationQuit()
     {
         socket.Disconnect();
     }
-
-}
-
-[System.Serializable]
-public class Test
-{
-    public string text;
 }
