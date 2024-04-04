@@ -26,11 +26,11 @@ const io = new Server(port);
 io.on("connection", (socket) => {
   console.log("Client Connected!");
 
-  // Dummy data for position and rotation
   const positions = [
-    { x: 8, y: 0, z: 0 },
-    { x: 0, y: 4, z: 0 },
-    { x: -8, y: 0, z: 0 },
+    { x: 8, y: 1, z: 0 },
+    { x: 0, y: 1, z: 8 },
+    { x: -8, y: 1, z: 0 },
+    { x: 0, y: 1, z: -8 },
   ];
 
   const rotations = [
