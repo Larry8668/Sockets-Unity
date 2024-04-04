@@ -5,42 +5,47 @@ const io = new Server(port);
 io.on("connection", (socket) => {
   console.log("Client Connected!");
 
-  const positions = [
-    { x: 8, y: 0, z: 0 },
-    { x: 0, y: 0, z: 8 },
-    { x: -8, y: 0, z: 0 },
-    { x: 0, y: 0, z: -8 },
+  const translations = [
+    {
+      position: { x: 0, y: 0, z: 5 },
+      rotation: { x: 0, y: -90, z: 0 },
+    },
+    {
+      position: { x: -5, y: 0, z: 5 },
+      rotation: { x: 0, y: -180, z: 0 },
+    },
+    {
+      position: { x: -5, y: 0, z: -5 },
+      rotation: { x: 0, y: -270, z: 0 },
+    },
+    {
+      position: { x: 5, y: 0, z: -5 },
+      rotation: { x: 0, y: 0, z: 0 },
+    },
+    {
+      position: { x: 5, y: 0, z: 5 },
+      rotation: { x: 0, y: -90, z: 0 },
+    },
+    {
+      position: { x: 0, y: 0, z: 5 },
+      rotation: { x: 0, y: -180, z: 0 },
+    },
+    {
+      position: { x: 0, y: 0, z: 0 },
+      rotation: { x: 0, y: 0, z: 0 },
+    },
   ];
 
   let currentIndex = 0;
 
-//   setInterval(() => {
-//     socket.emit("movementData", {
-//       position: {
-//         x: positions[currentIndex].x,
-//         y: positions[currentIndex].y,
-//         z: positions[currentIndex].z,
-//       },
-//       rotation: {
-//         x: rotations[currentIndex].x,
-//         y: rotations[currentIndex].y,
-//         z: rotations[currentIndex].z,
-//         w: rotations[currentIndex].w,
-//       },
-//     });
-
-//     currentIndex = (currentIndex + 1) % positions.length;
-//   }, 5000);
-
   setInterval(() => {
-    socket.emit("move", {
-      x: positions[currentIndex].x,
-      y: positions[currentIndex].y,
-      z: positions[currentIndex].z,
+    socket.emit("translate", {
+      position: translations[currentIndex].position,
+      rotation: translations[currentIndex].rotation,
     });
 
-    currentIndex = (currentIndex + 1) % positions.length;
-  }, 1000);
+    currentIndex = (currentIndex + 1) % translations.length;
+  }, 1500);
 
   socket.on("disconnect", (data) => {
     console.log("Client Disconnected!");

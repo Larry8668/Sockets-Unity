@@ -1,26 +1,44 @@
 using UnityEngine;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 public class MovementHandler : MonoBehaviour
 {
     public float smoothing = 7f;
-    private Vector3 target;
+    private Vector3 targetPosition;
+    private Quaternion targetRotation;
 
-    public Vector3 Target
+    public void SetMoveCoords(Vector3 position, Quaternion rotation)
     {
-        get { return target; }
-        set
-        {
-            target = value;
-            Debug.Log("Got value -->" + target);
-        }
+        targetPosition = position;
+        targetRotation = rotation;
+        Debug.Log("got Vector -->" + targetPosition);
+        Debug.Log("got Quaternion -->" + targetRotation);
     }
 
     void Update()
     {
-        if (Vector3.Distance(transform.position, target) > 0.5f)
+        MoveTowardsTargetPosition();
+        RotateTowardsTargetRotation();
+    }
+
+    void MoveTowardsTargetPosition()
+    {
+        if (Vector3.Distance(transform.position, targetPosition) > 0.5f)
         {
-            Debug.Log("Moving towards target");
-            transform.position = Vector3.Lerp(transform.position, target, smoothing * Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, targetPosition, smoothing * Time.deltaTime);
+        }
+    }
+
+    void RotateTowardsTargetRotation()
+    {
+        if (Quaternion.Angle(transform.rotation, targetRotation) > 1f)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, smoothing * Time.deltaTime);
+        }
+        else
+        {
+            transform.rotation = targetRotation;
         }
     }
 }
