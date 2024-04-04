@@ -1,24 +1,3 @@
-// import { Server } from "socket.io";
-// const port = 3000;
-// const io = new Server(port);
-
-// io.on("connection", (socket)=>{
-//     console.log("Client Connected!");
-
-//     socket.on("test", (data)=>{
-//         console.log("Client sent -->", data);
-
-//         var test = {text: "Hi"};
-//         socket.emit("test-back", test);
-//     })
-
-//     socket.on("disconnect", (data)=>{
-//         console.log("Client Disconnected!");
-//     })
-// })
-
-// console.log("Server Listening at :", port);
-
 import { Server } from "socket.io";
 const port = 3000;
 const io = new Server(port);
@@ -27,16 +6,10 @@ io.on("connection", (socket) => {
   console.log("Client Connected!");
 
   const positions = [
-    { x: 8, y: 1, z: 0 },
-    { x: 0, y: 1, z: 8 },
-    { x: -8, y: 1, z: 0 },
-    { x: 0, y: 1, z: -8 },
-  ];
-
-  const rotations = [
-    { x: 0, y: 0, z: 0, w: 0 },
-    { x: 0, y: 45, z: 0, w: 0 },
-    { x: 0, y: 90, z: 0, w: 0 },
+    { x: 8, y: 0, z: 0 },
+    { x: 0, y: 0, z: 8 },
+    { x: -8, y: 0, z: 0 },
+    { x: 0, y: 0, z: -8 },
   ];
 
   let currentIndex = 0;
