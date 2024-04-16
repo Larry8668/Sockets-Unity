@@ -2,8 +2,9 @@ using UnityEngine;
 using SocketIOClient;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using static DataFormat;
 
-public class SocketManager: MonoBehaviour
+public class SocketManager : MonoBehaviour
 {
     private SocketIOUnity socket;
     public MovementHandler movementScript;
@@ -17,6 +18,7 @@ public class SocketManager: MonoBehaviour
             Debug.Log("Connected to Server");
         };
 
+        /*
         socket.On("translate", (data) =>
         {
             List<(Vector3 position, Quaternion rotation)> moveCoordsList = getMoveCoords(data.ToString());
@@ -27,12 +29,26 @@ public class SocketManager: MonoBehaviour
                 Quaternion tempQuat = moveCoords.rotation;
                 movementScript.SetMoveCoords(tempVec, tempQuat);
             }
+        });*/
+
+        socket.On("mirror", (data) =>
+        {
+
+            List<(Vector3 position, Quaternion rotation)> moveCoordsList = mirrorPlayerMovement(data.ToString());
+
+            foreach (var moveCoords in moveCoordsList)
+            {
+                Vector3 tempVec = moveCoords.position;
+                Quaternion tempQuat = moveCoords.rotation;
+                movementScript.SetMoveCoords(tempVec, tempQuat);
+            }
         });
+
 
         socket.Connect();
     }
 
-    private Vector3 getCoord( string jsonData )
+    private Vector3 getCoord(string jsonData)
     {
         List<Dictionary<string, float>> dataList = JsonConvert.DeserializeObject<List<Dictionary<string, float>>>(jsonData);
 
@@ -53,7 +69,7 @@ public class SocketManager: MonoBehaviour
 
         foreach (var data in dataList)
         {
-            Vector3 positionVector = new Vector3(data.position.x, data.position.y, data.position.z);
+            Vector3 positionVector = new Vector3(data.position.x - 15, data.position.y, data.position.z);
             Quaternion rotationQuaternion = Quaternion.Euler(data.rotation.x, data.rotation.y, data.rotation.z);
 
             moveCoordsList.Add((positionVector, rotationQuaternion));
@@ -61,6 +77,38 @@ public class SocketManager: MonoBehaviour
 
         return moveCoordsList;
     }
+
+    public void SendPlayerMovement(Vector3 position, Quaternion rotation)
+    {
+        DataFormat data = new DataFormat
+        {
+            position = new PositionData { x = position.x - 15, y = position.y, z = position.z },
+            rotation = new RotationData { x = rotation.x, y = rotation.y, z = rotation.z, w = rotation.w }
+        };
+
+        string jsonData = JsonConvert.SerializeObject(data);
+
+        socket.Emit("player-move", jsonData);
+    }
+
+    public List<(Vector3 position, Quaternion rotation)> mirrorPlayerMovement(string jsonData)
+    {
+        List<string> outerArray = JsonConvert.DeserializeObject<List<string>>(jsonData);
+        string innerJson = outerArray[0];
+        DataFormat receivedData = JsonConvert.DeserializeObject<DataFormat>(innerJson);
+
+
+
+        List<(Vector3 position, Quaternion rotation)> moveCoordsList = new List<(Vector3 position, Quaternion rotation)>();
+
+        Vector3 positionVector = new Vector3(receivedData.position.x-15, receivedData.position.y, receivedData.position.z);
+        Quaternion rotationQuaternion = new Quaternion(receivedData.rotation.x, receivedData.rotation.y, receivedData.rotation.z, receivedData.rotation.w);
+
+        moveCoordsList.Add((positionVector, rotationQuaternion));
+
+        return moveCoordsList;
+    }
+
 
 
     private void OnApplicationQuit()
